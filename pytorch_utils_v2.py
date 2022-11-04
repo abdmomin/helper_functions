@@ -137,23 +137,23 @@ def plot_loss_curves(results):
 
     epochs = range(len(results["train_loss"]))
 
-    plt.figure(figsize=(15, 7))
+    plt.figure(figsize=(8, 8))
 
     # Plot loss
-    plt.subplot(1, 2, 1)
+    plt.subplot(2, 1, 1)
     plt.plot(epochs, loss, label="train_loss")
     plt.plot(epochs, test_loss, label="test_loss")
     plt.title("Loss")
     plt.xlabel("Epochs")
-    plt.legend()
+    plt.legend(loc='upper right')
 
     # Plot accuracy
-    plt.subplot(1, 2, 2)
+    plt.subplot(2, 1, 2)
     plt.plot(epochs, accuracy, label="train_accuracy")
     plt.plot(epochs, test_accuracy, label="test_accuracy")
     plt.title("Accuracy")
     plt.xlabel("Epochs")
-    plt.legend()
+    plt.legend(loc='lower right')
 
 
 # Pred and plot image function from notebook 04
@@ -167,8 +167,7 @@ def pred_and_plot_image(
     image_path: str,
     class_names: List[str] = None,
     transform=None,
-    device: torch.device = "cuda" if torch.cuda.is_available() else "cpu",
-):
+    device: torch.device = "cuda" if torch.cuda.is_available() else "cpu"):
     """Makes a prediction on a target image with a trained model and plots the image.
     Args:
         model (torch.nn.Module): trained PyTorch image classification model.
@@ -220,9 +219,9 @@ def pred_and_plot_image(
         target_image.squeeze().permute(1, 2, 0)
     )  # make sure it's the right size for matplotlib
     if class_names:
-        title = f"Pred: {class_names[target_image_pred_label.cpu()]} | Prob: {target_image_pred_probs.max().cpu():.3f}"
+        title = f"Pred: {class_names[target_image_pred_label.cpu()]} | Prob: {target_image_pred_probs.max().cpu():.3f}%"
     else:
-        title = f"Pred: {target_image_pred_label} | Prob: {target_image_pred_probs.max().cpu():.3f}"
+        title = f"Pred: {target_image_pred_label} | Prob: {target_image_pred_probs.max().cpu():.3f}%"
     plt.title(title)
     plt.axis(False)
 
@@ -253,25 +252,25 @@ def download_data(source: str,
                       destination="pizza_steak_sushi")
     """
     # Setup path to data folder
-    data_path = Path("data/")
-    image_path = data_path / destination
+    data_path = "data"
+    image_path = os.path.join(data_path, destination)
 
     # If the image folder doesn't exist, download it and prepare it... 
-    if image_path.is_dir():
+    if os.path.exists(image_path):
         print(f"[INFO] {image_path} directory exists, skipping download.")
     else:
         print(f"[INFO] Did not find {image_path} directory, creating one...")
-        image_path.mkdir(parents=True, exist_ok=True)
+        os.makedirs(image_path)
         
         # Download pizza, steak, sushi data
-        target_file = Path(source).name
-        with open(data_path / target_file, "wb") as f:
+        target_file = os.listdir(source)
+        with open(os.path.join(data_path, target_file), "wb") as f:
             request = requests.get(source)
             print(f"[INFO] Downloading {target_file} from {source}...")
             f.write(request.content)
 
         # Unzip pizza, steak, sushi data
-        with zipfile.ZipFile(data_path / target_file, "r") as zip_ref:
+        with zipfile.ZipFile(os.jath.join(data_path, target_file), "r") as zip_ref:
             print(f"[INFO] Unzipping {target_file} data...") 
             zip_ref.extractall(image_path)
 
@@ -282,7 +281,7 @@ def download_data(source: str,
     return image_path
 
 
-!pip install -qq torchmetrics -U mlextend
+# !pip install -qq torchmetrics -U mlextend
 from torchmetrics import ConfusionMatrix
 from mlextend.plotting import plot_confusion_matrix
 

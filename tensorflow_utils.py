@@ -2,6 +2,7 @@
 ### Storing them here so they're easily accessible.
 
 import tensorflow as tf
+import os
 
 # Create a function to import an image and resize it to be able to be used with our model
 def load_and_prep_image(filename, img_shape=224, scale=True):
@@ -139,7 +140,8 @@ def create_tensorboard_callback(dir_name, experiment_name):
     dir_name: target directory to store TensorBoard log files
     experiment_name: name of experiment directory (e.g. efficientnet_model_1)
   """
-  log_dir = dir_name + "/" + experiment_name + "/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+  experiment_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+  log_dir = os.path.join(dir_name, experiment_name, experiment_time)
   tensorboard_callback = tf.keras.callbacks.TensorBoard(
       log_dir=log_dir
   )
@@ -175,7 +177,7 @@ def plot_loss_curves(history):
   plt.plot(val_accuracy, label='Validation accuracy')
   plt.title('Accuracy')
   plt.xlabel('Epochs')
-  plt.legend(loc='lower right');
+  plt.legend(loc='lower right')
 
 def compare_historys(original_history, new_history, initial_epochs=5):
     """
@@ -236,7 +238,6 @@ def unzip_data(filename):
 
 # Walk through an image classification directory and find out how many files (images)
 # are in each subdirectory.
-import os
 
 def walk_through_dir(dir_path):
   """
